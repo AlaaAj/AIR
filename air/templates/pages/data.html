@@ -1,0 +1,61 @@
+{% extends 'pages/main.html'%}
+
+{% block content %}
+
+<h1 class="pt-5 pl-5">Quastion and Answer</h1>
+
+
+<div class="container">
+  <a class="tablinks" href="admin"> Add new Quastion from Data </a>
+  <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search" title="Type in a name">
+ 
+  <div class="card" id="myTable">
+
+
+    <div class="container">
+      {% for item in data  %}
+      <table id="myTable">
+        <tr class="header">
+          <th style="width:60%;"></th>
+        </tr>
+          <tr>
+             <td>    <h4><b>{{item.quastion}}</b></h4></td></tr>
+             <tr><td>      <p>{{item.answer}}</p></td></tr>
+                </table>
+  
+      {% endfor %}
+    </div>
+    
+    <div class="row" style="height: 100px; width: 100px;"></div> 
+  </div>
+
+ 
+
+</div>
+
+<script>
+  function myFunction() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }       
+    }
+  }
+
+
+ 
+  </script>
+  
+
+{% endblock %}
