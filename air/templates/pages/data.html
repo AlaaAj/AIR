@@ -2,36 +2,49 @@
 
 {% block content %}
 
-<h1 class="pt-5 pl-5">Quastion and Answer</h1>
 
-
-<div class="container">
-  <a class="tablinks" href="admin"> Add new Quastion from Data </a>
-  <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search" title="Type in a name">
- 
-  <div class="card" id="myTable">
-
-
-    <div class="container">
-      {% for item in data  %}
-      <table id="myTable">
-        <tr class="header">
-          <th style="width:60%;"></th>
-        </tr>
-          <tr>
-             <td>    <h4><b>{{item.quastion}}</b></h4></td></tr>
-             <tr><td>      <p>{{item.answer}}</p></td></tr>
-                </table>
+<html>
+  <head>
+    <style>
+           .hl {
+      background-color: red;
+      position: absolute;
+      z-index: -1;
+    }
+  </style>
+   
+  </head>
+    <body>
+      <a class="tablinks" href="admin"> Add new Quastion to Data        </a>
+      <button id="a">Color</button>
+<div class="container" id="bb">
   
-      {% endfor %}
-    </div>
-    
-    <div class="row" style="height: 100px; width: 100px;"></div> 
-  </div>
-
  
+  
+
+  <div id="b">
+    
+    {% for item in data  %}
+    {% for q in result %}
+
+      {% if item.quastion == q  %}
+        <table id="myTable">
+         <tr class="header">
+
+           <th style="width:60%;"></th>
+         </tr>
+         <tr>
+            <td>    <h4><b>{{item.quastion}}</b></h4></td></tr>
+         <tr><td>      <p>{{item.answer}}</p></td></tr>
+            </table>
+       {% endif %}
+    {% endfor %}
+  {% endfor %}  </div>
 
 </div>
+</body>
+</html>
+
 
 <script>
   function myFunction() {
@@ -53,7 +66,98 @@
     }
   }
 
+document.querySelector('#a').onclick = (e) => {
 
+let topParent = document.querySelector('#b');
+let s, range;
+//let strToSearch = document.querySelector('#search').value
+let strToSearch = "{{query}}"
+
+const a =strToSearch.split(" ")
+if(a.length > 0)
+  strToSearch=a[0]
+
+let re = RegExp(strToSearch, 'g')
+
+
+
+
+removeHighlight()
+s = window.getSelection();
+s.removeAllRanges()
+// to handle multiple result you need to go through all matches
+while (match = re.exec(topParent.textContent)) {
+
+  let it = iterateNode(topParent);
+  let currentIndex = 0;
+  // the result is the text node, so you can iterate and compare the index you are searching to all text nodes length
+  let result = it.next();
+
+  while (!result.done) {
+    if (match.index >= currentIndex && match.index < currentIndex + result.value.length) {
+      // when we have the correct node and index we add a range
+      range = new Range();
+      range.setStart(result.value, match.index - currentIndex)
+
+    }
+
+   
+      if (match.index + strToSearch.length >= currentIndex && match.index + strToSearch.length < currentIndex + result.value.length) {
+        // when we find the end node, we can set the range end
+        range.setEnd(result.value, match.index + strToSearch.length - currentIndex)
+        s.addRange(range)
+
+        // this is where we add the divs based on the client rects of the range
+        addHighlightDiv(range.getClientRects())
+
+
+       }
+  
+    currentIndex += result.value.length;
+    result = it.next();
+  }
+}
+s.removeAllRanges()
+
+}
+
+
+function* iterateNode(topNode) {
+// this iterate through all descendants of the topnode
+let childNodes = topNode.childNodes;
+for (let i = 0; i < childNodes.length; i++) {
+  let node = childNodes[i]
+  if (node.nodeType === 3) {
+    yield node;
+  } else {
+    yield* iterateNode(node);
+  }
+}
+
+}
+
+function addHighlightDiv(rects) {
+for (let i = 0; i < rects.length; i++) {
+
+  let rect = rects[i];
+  let highlightRect = document.createElement('DIV')
+  document.body.appendChild(highlightRect)
+  highlightRect.classList.add('hl')
+  highlightRect.style.top = rect.y + window.scrollY + 'px'
+  highlightRect.style.left = rect.x + 'px'
+  highlightRect.style.height = rect.height + 'px'
+  highlightRect.style.width = rect.width + 'px'
+
+}
+
+}
+
+function removeHighlight() {
+let highlights = document.querySelectorAll('.hl');
+for (let i = 0; i < highlights.length; i++) {
+  highlights[i].remove();
+}
+}
  
   </script>
   
