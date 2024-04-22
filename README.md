@@ -1,2 +1,2 @@
 # AIR
-Information Retrival
+Information Retrieval
